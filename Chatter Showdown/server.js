@@ -17,7 +17,13 @@ client.connect();
 
 client.on('message', (channel, tags, message, self) => {
 	// "Alca: Hello, World!"
-	console.log(`${tags['display-name']}: ${message}`);
+
+    if(message == "!showStats") {
+        console.log("Displaying Statistics for: " + `${tags['display-name']}`);
+    } else {
+        console.log(`${tags['display-name']}: ${message}`);
+    }
+	
     if(chatUsers.length > 0) {
         for(let i = 0; i <= chatUsers.length; i++) {
             if(tags['display-name'] == chatUsers[i].username) {
@@ -33,7 +39,8 @@ client.on('message', (channel, tags, message, self) => {
     } else {
         let newChatter = new user(tags['display-name'], 0, "temp");
         chatUsers.push(newChatter);
-        console.log("new user created");
+        console.log("Creating new new user...");
+        console.log("Adding user to database...")
         console.log(newChatter);
     }
 });
