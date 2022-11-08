@@ -16,6 +16,13 @@ async function connect() {
     try {
         await mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true });
         console.log("MongoDB succesfully connected");
+        initializeLocalArray();
+    } catch (error) {
+        console.error(error);
+    }
+    try {
+        //await User.deleteOne({ username: 'BukitHat' });
+        console.log("reset...")
     } catch (error) {
         console.error(error);
     }
@@ -23,18 +30,36 @@ async function connect() {
 connect();
 
 async function update(name) {
-    
+    var tempUser = await User.find({ username: name }).limit(1);
+    newChatCount = tempUser[0].chatCount + 1;
+
     try {
         await User.findOneAndUpdate({
             username: name
         }, {
-            chatCount: chatCount+1
+            chatCount: newChatCount
         }, {
-            upsert: false,
+            upsert: false
         })
         console.log("user updated successfully!")
     } catch (error) {
         console.error(error);
+    }
+}
+
+async function initializeLocalArray() {
+    tempArr = await User.find({ bio: "Twitch Chatter" }).lean();
+    if(tempArr.length > 0) {
+        for(let i = 0; i <= tempArr.length-1; i++) {
+            tempSplit = JSON.stringify(tempArr[i])
+            console.log(tempSplit);
+            console.log(tempSplit.indexOf(":",34));
+            console.log(tempSplit.indexOf(",",34));
+            indexOfBeginningOfUsername = tempSplit.indexOf(":",34) + 2;
+            indexOfEndOfUsername = tempSplit.indexOf(",",34);
+
+            newString = tempSplit.index[indexOfBeginningOfUsername, indexOfEndOfUsername];
+        }
     }
 }
 
@@ -105,11 +130,6 @@ function createUser(name) {
             });
     
 }
-
-
-
-
-
 
 
 
