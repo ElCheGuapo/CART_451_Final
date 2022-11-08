@@ -18,6 +18,7 @@ async function connect() {
         console.log(" ");
         console.log("MongoDB succesfully connected!");
         console.log("_______________________________");
+        console.log(" ");
         initializeLocalArray();
     } catch (error) {
         console.error(error);
