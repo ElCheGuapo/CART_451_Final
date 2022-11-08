@@ -4,11 +4,11 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     username: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     chatCount: {
-        type: Number,
-        required: true
+        type: Number
     },
     bio: {
         type: String,
