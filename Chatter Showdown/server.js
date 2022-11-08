@@ -15,14 +15,10 @@ const uri = 'mongodb+srv://BukkitDev:HugoleBreton_2023@cluster0.ztak5ab.mongodb.
 async function connect() {
     try {
         await mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true });
-        console.log("MongoDB succesfully connected");
+        console.log(" ");
+        console.log("MongoDB succesfully connected!");
+        console.log("_______________________________");
         initializeLocalArray();
-    } catch (error) {
-        console.error(error);
-    }
-    try {
-        //await User.deleteOne({ username: 'BukitHat' });
-        console.log("reset...")
     } catch (error) {
         console.error(error);
     }
@@ -41,7 +37,7 @@ async function update(name) {
         }, {
             upsert: false
         })
-        console.log("user updated successfully!")
+        //console.log("user updated successfully!")
     } catch (error) {
         console.error(error);
     }
@@ -52,15 +48,24 @@ async function initializeLocalArray() {
     if(tempArr.length > 0) {
         for(let i = 0; i <= tempArr.length-1; i++) {
             tempSplit = JSON.stringify(tempArr[i])
-            console.log(tempSplit);
-            console.log(tempSplit.indexOf(":",34));
-            console.log(tempSplit.indexOf(",",34));
             indexOfBeginningOfUsername = tempSplit.indexOf(":",34) + 2;
-            indexOfEndOfUsername = tempSplit.indexOf(",",34);
+            indexOfEndOfUsername = tempSplit.indexOf(",",34) - 1;
 
-            newString = tempSplit.index[indexOfBeginningOfUsername, indexOfEndOfUsername];
+            let newString = tempSplit.substring(indexOfBeginningOfUsername, indexOfEndOfUsername);
+            chatUsers.push(newString)
         }
     }
+}
+
+async function fetchUser(name) {
+    var tempUser = await User.find({ username: name }).limit(1);
+    console.log("______________________");
+    console.log("Username: " + tempUser[0].username);
+    console.log(" ");
+    console.log("Total Messages Sent: " + tempUser[0].chatCount);
+    console.log(" ");
+    console.log("About: " + tempUser[0].bio);
+    console.log("______________________");
 }
 
 //EXPRESS code
@@ -68,31 +73,31 @@ app.use(express.static(__dirname + '/public'));
 app.use('/', jsRouter);
 
 server.listen(portNumber, function(req, res){
+    console.log("_______________________________");
     console.log("server is running on port " + portNumber);
+    console.log("...");
 });
-
-
 
 //TMI.js code
 const client = new tmi.Client({
 	channels: [ 'bukithat' ]
 });
+
 client.connect();
 client.on('message', (channel, tags, message, self) => {
 	// "Alca: Hello, World!"
 
     //handle ! commands
     if(message == "!showStats") {
-        console.log("Displaying Statistics for: " + `${tags['display-name']}`);
-    } else {
-        console.log(`${tags['display-name']}: ${message}`);
+        //console.log("Displaying Statistics for: " + `${tags['display-name']}`);
+        fetchUser(tags['display-name']);
     }
 
     //handle User Creating/Updating
     if(chatUsers.length > 0) {
         for(let i = 0; i <= chatUsers.length; i++) {
 
-            if(tags['display-name'] == chatUsers[i].username) {
+            if(tags['display-name'] == chatUsers[i]) {
                 update(tags['display-name'])
                 break;
 
@@ -107,6 +112,7 @@ client.on('message', (channel, tags, message, self) => {
 
 function createUser(name) {
     //Create
+    console.log("______________________");
     console.log("creating new User...");
     const user = new User({
         username: name,
@@ -115,9 +121,10 @@ function createUser(name) {
     });
 
     //Local Save
+    console.log(" ");
     console.log("uploading user to local storage...");
     chatUsers.push(user);
-
+    console.log(" ");
     //Cloud Save
     console.log("uploading user to database...");
     user.save()
@@ -129,6 +136,7 @@ function createUser(name) {
                 console.log(error);
             });
     
+    console.log("______________________");
 }
 
 
