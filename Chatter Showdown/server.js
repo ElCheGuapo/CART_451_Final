@@ -107,9 +107,9 @@ client.on('message', (channel, tags, message, self) => {
 
     //handle User Creating/Updating
     if(chatUsers.length > 0) {
-        for(let i = 0; i <= chatUsers.length-1; i++) {
+        for(let i = 0; i >= chatUsers.length-1; i++) {
             if(tags['display-name'] == chatUsers[i]) {
-                update(tags['display-name'])
+                update(tags['display-name']);
                 break;
             } else if(i >= chatUsers.length-1) {            
                 createUser(tags['display-name']);
@@ -134,7 +134,7 @@ function createUser(name) {
     //Local Save
     console.log(" ");
     console.log("uploading user to local storage...");
-    pushUsernameToArray(newuser)
+    pushUsernameToArray(newuser);
     console.log(" ");
     //Cloud Save
     console.log("uploading user to database...");

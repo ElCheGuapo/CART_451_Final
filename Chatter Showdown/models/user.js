@@ -8,8 +8,7 @@ const userSchema = new Schema({
         unique: true
     },
     chatCount: {
-        type: Number,
-        required: true
+        type: Number
     },
     bio: {
         type: String,
