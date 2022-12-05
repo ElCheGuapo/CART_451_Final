@@ -24,6 +24,7 @@ async function connect() {
         console.error(error);
     }
 }
+
 connect();
 
 async function update(name) {

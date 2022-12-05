@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const beautifyUnique = require('mongoose-beautiful-unique-validation');
+
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -8,7 +10,8 @@ const userSchema = new Schema({
         unique: true
     },
     chatCount: {
-        type: Number
+        type: Number,
+        unique: false
     },
     bio: {
         type: String,

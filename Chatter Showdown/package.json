@@ -12,6 +12,7 @@
   "dependencies": {
     "express": "^4.18.2",
     "mongoose": "^6.7.2",
+    "mongoose-beautiful-unique-validation": "^7.1.1",
     "socket.io": "^4.5.2",
     "tmi.js": "^1.8.5"
   }
