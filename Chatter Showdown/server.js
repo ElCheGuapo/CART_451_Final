@@ -1,5 +1,10 @@
 const tmi = require('tmi.js');
 let chatUsers = [];
+let leaderboard = [];
+let currentVs = [];
+const availableMoves = ["!rock","!paper","!scissors"];
+let currentMoves = [];
+let duelActive = false;
 
 var jsRouter = require('./router.js');
 var express = require('express');
@@ -10,7 +15,7 @@ let server = require('http').createServer(app);
 
 const portNumber = 3000;
 const uri = 'mongodb+srv://BukkitDev:HugoleBreton_2023@cluster0.ztak5ab.mongodb.net/?retryWrites=true&w=majority'
-
+const channelName = "BukitHat"
 //MONGODB code
 async function connect() {
     try {
@@ -93,33 +98,51 @@ server.listen(portNumber, function(req, res){
 
 //TMI.js code
 const client = new tmi.Client({
-	channels: [ 'bukithat' ]
+	channels: [ channelName ]
 });
 
 client.connect();
 client.on('message', (channel, tags, message, self) => {
-	// "Alca: Hello, World!"
-
     //handle ! commands
     if(message == "!showStats") {
         //console.log("Displaying Statistics for: " + `${tags['display-name']}`);
         fetchUser(tags['display-name']);
+    } else if(tags['display-name'] == channelName && message.includes("!beginDuel")) {
+        let tempArr = message.split(".");
+        duelActive = true
+        RockPaperScissorsInit(tempArr[1], tempArr[2]);
+        // if (chatUsers.includes(tempArr[1]) && chatUsers.includes(tempArr[2])) {
+        //     console.log("this works");
+        // }
+
+    } else if (duelActive) {
+        if(currentVs[0].username == (tags['display-name'])) {
+            if(availableMoves.includes(message)) {
+                currentMoves[0] = message;
+                console.log("Player 2 selected their move");
+            }
+            
+        } else if(currentVs[1].username == (tags['display-name'])) {
+            if(availableMoves.includes(message)) {
+                currentMoves[1] = message;
+                console.log("Player 2 selected their move");
+            }
+        }
     }
+
 
     //handle User Creating/Updating
     if(chatUsers.length > 0) {
-        for(let i = 0; i >= chatUsers.length-1; i++) {
-            if(tags['display-name'] == chatUsers[i]) {
-                update(tags['display-name']);
-                break;
-            } else if(i >= chatUsers.length-1) {            
-                createUser(tags['display-name']);
-                break;
-            }
+        if(chatUsers.includes(tags['display-name'])) {
+            update(tags['display-name']);
+        } else {
+            createUser(tags['display-name']);
         }
     } else {
         createUser(tags['display-name']);
     }
+
+    RockPaperScissors();
 });
 
 function createUser(name) {
@@ -149,6 +172,78 @@ function createUser(name) {
             .catch((error) => {
                 console.log(error);
             });
+}
+
+async function RockPaperScissorsInit(user1, user2) {
+    if(duelActive){
+        
+        let tempUser1 = await User.find({ username: user1 }).lean();
+        let tempUser2 = await User.find({ username: user2 }).lean();
+        Player_1 = {
+            username: tempUser1[0].username,
+            chatPower: tempUser1[0].chatCount
+        }
+        Player_2 = {
+            username: tempUser2[0].username,
+            chatPower: tempUser2[0].chatCount
+        }
+
+        currentVs.push(Player_1);
+        currentVs.push(Player_2);
+
+    }
+
+}
+
+async function RockPaperScissors() {
+    if(duelActive && currentMoves.length == 2) {
+
+        //check who wins round
+        if(currentMoves[0] == "!rock" && currentMoves[1] == "!rock") {
+            console.log("tie");
+
+        } else if(currentMoves[0] == "!rock" && currentMoves[1] == "!paper") {
+            console.log("player 2 wins");
+            currentVs[0].chatPower -= currentVs[1].chatPower
+
+        } else if(currentMoves[0] == "!rock" && currentMoves[1] == "!scissors") {
+            console.log("player 1 wins");
+            currentVs[1].chatPower -= currentVs[0].chatPower
+
+        } else if(currentMoves[0] == "!scissors" && currentMoves[1] == "!paper") {
+            console.log("player 1 wins");
+            currentVs[1].chatPower -= currentVs[0].chatPower
+
+        } else if(currentMoves[0] == "!scissors" && currentMoves[1] == "!rock") {
+            console.log("player 2 wins");
+            currentVs[0].chatPower -= currentVs[1].chatPower
+
+        } else if(currentMoves[0] == "!scissors" && currentMoves[1] == "!scissors") {
+            console.log("tie");
+        } else if(currentMoves[0] == "!paper" && currentMoves[1] == "!rock") {
+            console.log("player 1 wins");
+            currentVs[1].chatPower -= currentVs[0].chatPower
+
+        } else if(currentMoves[0] == "!paper" && currentMoves[1] == "!scissors") {
+            console.log("player 2 wins");
+            currentVs[0].chatPower -= currentVs[1].chatPower
+
+        } else if(currentMoves[0] == "!paper" && currentMoves[1] == "!paper") {
+            console.log("tie");
+        }
+
+        //check for win
+        if(currentVs[0].chatPower <= 0) {
+            console.log("player 2 wins!");
+            duelActive = false;
+            currentVs = [];
+        } else if(currentVs[1].chatPower <= 0) {
+            console.log("player 1 wins!");
+            duelActive = false;
+            currentVs = [];
+        }
+        currentMoves = [];
+    }
 }
 
 
