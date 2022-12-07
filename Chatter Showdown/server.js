@@ -148,7 +148,7 @@ client.on('message', (channel, tags, message, self) => {
     }
 
     RockPaperScissors();
-  jj});
+});
 
 function createUser(name) {
     //Create
