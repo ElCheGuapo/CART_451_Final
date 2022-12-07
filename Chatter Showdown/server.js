@@ -98,6 +98,11 @@ server.listen(portNumber, function(req, res){
 
 //TMI.js code
 const client = new tmi.Client({
+    options: { debug: true },
+	identity: {
+		username: 'RoshanBot',
+		password: 'oauth:8t0cuokz0dtdb3n172kbl2abx0fkm6'
+	},
 	channels: [ channelName ]
 });
 
@@ -119,13 +124,13 @@ client.on('message', (channel, tags, message, self) => {
         if(currentVs[0].username == (tags['display-name'])) {
             if(availableMoves.includes(message)) {
                 currentMoves[0] = message;
-                console.log("Player 2 selected their move");
+                client.say(channel, `@${tags.username}, has selected their move`);
             }
             
         } else if(currentVs[1].username == (tags['display-name'])) {
             if(availableMoves.includes(message)) {
                 currentMoves[1] = message;
-                console.log("Player 2 selected their move");
+                client.say(channel, `@${tags.username}, has selected their move`);
             }
         }
     }
@@ -143,7 +148,7 @@ client.on('message', (channel, tags, message, self) => {
     }
 
     RockPaperScissors();
-});
+  jj});
 
 function createUser(name) {
     //Create
@@ -245,6 +250,20 @@ async function RockPaperScissors() {
         currentMoves = [];
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
