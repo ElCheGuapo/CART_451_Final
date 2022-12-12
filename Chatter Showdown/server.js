@@ -152,7 +152,6 @@ client.on('message', (channel, tags, message, self) => {
         //console.log("Displaying Statistics for: " + `${tags['display-name']}`);
         fetchUser(tags['display-name']);
     } else if(tags['display-name'] == channelName && message.includes("!beginDuel")) {
-        VipMessage.push('BukitHat');
         let tempArr = message.split(".");
         RockPaperScissorsInit(tempArr[1], tempArr[2]);
         client.say(channel, `LETS FIGHT!!` + tempArr[1] + tempArr[2]);

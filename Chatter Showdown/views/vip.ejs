@@ -9,7 +9,8 @@
 <body>
     <div class="w3-center">
         <h1><%= data[0] %>: </h1>
-        <p>" <%= data[data.length] %> "</p>
+        <% let x = data.length - 1%>
+        <p>" <%= data[x] %> "</p>
     </div>
 </body>
 </html>
