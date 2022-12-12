@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">  
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <title>RockPaperScissors</title>
+</head>
+<body>
+    <div class="w3-row-padding w3-section">
+
+        <div class="w3-half">
+            <div class="w3-card">
+                <% if (PlayerMoves[0] != "null") { %>
+
+                    <% if (PlayerMoves[0] == "!rock") { %>
+                        <img src="./images/img_rock.png" alt="rock" style="width:100%"> 
+                    <% } else if (PlayerMoves[0] == "!paper") { %>
+                        <img src="./images/img_paper.png" alt="paper" style="width:100%">
+                    <% } else if (PlayerMoves[0] == "!scissors") { %>
+                        <img src="./images/img_scissors.png" alt="scissors" style="width:100%">
+                    <% } %>
+    
+                <% } %>
+            </div>
+        </div>
+
+        <div class="w3-half">
+            <div class="w3-card">
+            <% if (PlayerMoves[1] != "null") { %>
+
+                <% if (PlayerMoves[1] == "!rock") { %>
+                    <img src="public/images/img_rock.png" alt="rock" style="width:100%"> 
+                <% } else if (PlayerMoves[1] == "!paper") { %>
+                    <img src="/Chatter Showdown/views/public/images/img_paper.png" alt="paper" style="width:100%">
+                <% } else if (PlayerMoves[1] == "!scissors") { %>
+                    <img src="/Chatter Showdown/views/public/images/img_scissors.png" alt="scissors" style="width:100%">
+                <% } %>
+
+            <% } %>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

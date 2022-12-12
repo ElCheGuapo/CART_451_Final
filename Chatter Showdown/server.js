@@ -1,21 +1,46 @@
-const tmi = require('tmi.js');
-let chatUsers = [];
-let leaderboard = [];
-let currentVs = [];
-const availableMoves = ["!rock","!paper","!scissors"];
-let currentMoves = [];
-let duelActive = false;
+let chatUsers = []
+let leaderboard = []
+let currentVs = []
+let currentMoves = ['null', 'null']
+let VipMessage = [];
+let duelActive = false
 
-var jsRouter = require('./router.js');
-var express = require('express');
-var mongoose = require('mongoose');
-const User = require('./models/user.js');
-var app = express();
+const tmi = require('tmi.js')
+const express = require('express')
+const mongoose = require('mongoose')
+
+const app = express()
+app.set('view engine', 'ejs')
+
 let server = require('http').createServer(app);
+
+const User = require('./models/user.js')
+const jsRouter = require('./router.js')
 
 const portNumber = 3000;
 const uri = 'mongodb+srv://BukkitDev:HugoleBreton_2023@cluster0.ztak5ab.mongodb.net/?retryWrites=true&w=majority'
 const channelName = "BukitHat"
+
+//EXPRESS code
+app.use('/more', jsRouter);
+app.get('/', (req, res) => {
+    res.render('index', { text: 'CUM' });
+})
+app.get('/leaderboard', (req, res) => {
+    res.render('leaderboard', { users: leaderboard });
+})
+app.get('/RPS', (req, res) => {
+    res.render('RPS', { PlayerMoves: currentMoves });
+})
+app.get('/vip', (req, res) => {
+    res.render('vip', { data: VipMessage });
+})
+server.listen(portNumber, function(req, res){
+    console.log("_______________________________");
+    console.log("server is running on port " + portNumber);
+    console.log("...");
+});
+
 //MONGODB code
 async function connect() {
     try {
@@ -25,11 +50,11 @@ async function connect() {
         console.log("_______________________________");
         console.log(" ");
         initializeLocalArray();
+
     } catch (error) {
         console.error(error);
     }
 }
-
 connect();
 
 async function update(name) {
@@ -52,7 +77,10 @@ async function update(name) {
 }
 
 async function initializeLocalArray() {
-    let tempArr = await User.find({ bio: "Twitch Chatter" }).lean();
+    chatUsers = []
+    let tempArr = await User.find({ bio: "Twitch Chatter" }).sort({
+        chatCount: -1
+    }).lean();
     if(tempArr.length > 0) {
         for(let i = 0; i <= tempArr.length-1; i++) {
             let tempSplit = JSON.stringify(tempArr[i])
@@ -86,15 +114,20 @@ async function fetchUser(name) {
     console.log("______________________");
 }
 
-//EXPRESS code
-app.use(express.static(__dirname + '/public'));
-app.use('/', jsRouter);
-
-server.listen(portNumber, function(req, res){
-    console.log("_______________________________");
-    console.log("server is running on port " + portNumber);
-    console.log("...");
-});
+async function refreshLeaderboard() {
+    leaderboard = [];
+    connect();
+    if(chatUsers.length >= 3) {
+        for (let i = 0; i < 3; i++) {
+            leaderboard.push(chatUsers[i])
+        }
+    } else {
+        for (let i = 0; i < chatUsers.length; i++) {
+            leaderboard.push(chatUsers[i])
+        }
+    }
+    //console.log(leaderboard);    
+}
 
 //TMI.js code
 const client = new tmi.Client({
@@ -108,17 +141,21 @@ const client = new tmi.Client({
 
 client.connect();
 client.on('message', (channel, tags, message, self) => {
+    const availableMoves = ["!rock","!paper","!scissors"]
+
     //handle ! commands
+    if (tags['display-name'] == VipMessage[0] && !availableMoves.includes(message)) {
+        VipMessage.push(message);
+        console.log(VipMessage);
+    }
     if(message == "!showStats") {
         //console.log("Displaying Statistics for: " + `${tags['display-name']}`);
         fetchUser(tags['display-name']);
     } else if(tags['display-name'] == channelName && message.includes("!beginDuel")) {
+        VipMessage.push('BukitHat');
         let tempArr = message.split(".");
-        duelActive = true
         RockPaperScissorsInit(tempArr[1], tempArr[2]);
-        // if (chatUsers.includes(tempArr[1]) && chatUsers.includes(tempArr[2])) {
-        //     console.log("this works");
-        // }
+        client.say(channel, `LETS FIGHT!!` + tempArr[1] + tempArr[2]);
 
     } else if (duelActive) {
         if(currentVs[0].username == (tags['display-name'])) {
@@ -142,12 +179,17 @@ client.on('message', (channel, tags, message, self) => {
             update(tags['display-name']);
         } else {
             createUser(tags['display-name']);
+            client.say(channel, `@${tags.username}, welcome!`);
         }
     } else {
         createUser(tags['display-name']);
+        client.say(channel, `@${tags.username}, welcome!`);
     }
 
     RockPaperScissors();
+    if(!duelActive) {
+        refreshLeaderboard();
+    }
 });
 
 function createUser(name) {
@@ -180,28 +222,26 @@ function createUser(name) {
 }
 
 async function RockPaperScissorsInit(user1, user2) {
-    if(duelActive){
-        
-        let tempUser1 = await User.find({ username: user1 }).lean();
-        let tempUser2 = await User.find({ username: user2 }).lean();
-        Player_1 = {
-            username: tempUser1[0].username,
-            chatPower: tempUser1[0].chatCount
-        }
-        Player_2 = {
-            username: tempUser2[0].username,
-            chatPower: tempUser2[0].chatCount
-        }
+    let tempUser1 = await User.find({ username: user1 }).lean();
+    let tempUser2 = await User.find({ username: user2 }).lean();
 
-        currentVs.push(Player_1);
-        currentVs.push(Player_2);
-
+    Player_1 = {
+        username: tempUser1[0].username,
+        chatPower: tempUser1[0].chatCount
     }
+    Player_2 = {
+        username: tempUser2[0].username,
+        chatPower: tempUser2[0].chatCount
+    }
+    currentVs.push(Player_1);
+    currentVs.push(Player_2);
+
+    duelActive = true
 
 }
 
 async function RockPaperScissors() {
-    if(duelActive && currentMoves.length == 2) {
+    if(duelActive && currentMoves[0] != 'null' && currentMoves[1] != 'null') {
 
         //check who wins round
         if(currentMoves[0] == "!rock" && currentMoves[1] == "!rock") {
@@ -239,50 +279,22 @@ async function RockPaperScissors() {
 
         //check for win
         if(currentVs[0].chatPower <= 0) {
+            VipMessage = []
+            VipMessage.push(currentVs[1].username)
             console.log("player 2 wins!");
             duelActive = false;
             currentVs = [];
         } else if(currentVs[1].chatPower <= 0) {
+            VipMessage = []
+            VipMessage.push(currentVs[0].username)
             console.log("player 1 wins!");
             duelActive = false;
             currentVs = [];
         }
-        currentMoves = [];
+        currentMoves = []
+        for(let i = 0; i < 2; i++) {
+            currentMoves.push("null");
+        }
+        console.log(currentMoves);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// if(chatUsers > 0) {
-//     var data = {
-//         username: chatUsers[0].username,
-//         count: chatUsers[0].chatCount
-//     }
-    
-//     socket.emit("sendD", data, (response) => {
-//         console.log(response); // "got it"
-//     });
-// }
-
-// var socket = require('socket.io');
-// var io = socket(server);
-
-// io.sockets.on('connection', function() {
-//     console.log("New connection " + socket);
-// });
