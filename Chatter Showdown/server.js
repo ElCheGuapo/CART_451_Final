@@ -24,13 +24,13 @@ const channelName = "BukitHat"
 //EXPRESS code
 app.use('/more', jsRouter);
 app.get('/', (req, res) => {
-    res.render('index', { text: 'CUM' });
+    res.render('index', { text: channelName });
 })
 app.get('/leaderboard', (req, res) => {
     res.render('leaderboard', { users: leaderboard });
 })
 app.get('/RPS', (req, res) => {
-    res.render('RPS', { PlayerMoves: currentMoves });
+    res.render('RPS', { PlayerMoves: currentMoves , Players: currentVs, fight: duelActive});
 })
 app.get('/vip', (req, res) => {
     res.render('vip', { data: VipMessage });
@@ -171,19 +171,21 @@ client.on('message', (channel, tags, message, self) => {
         }
     }
 
-
+    if (tags['display-name'] != "StreamLabs"){
     //handle User Creating/Updating
-    if(chatUsers.length > 0) {
-        if(chatUsers.includes(tags['display-name'])) {
-            update(tags['display-name']);
+        if(chatUsers.length > 0) {
+            if(chatUsers.includes(tags['display-name'])) {
+                update(tags['display-name']);
+            } else {
+                createUser(tags['display-name']);
+                client.say(channel, `@${tags.username}, welcome!`);
+            }
         } else {
             createUser(tags['display-name']);
             client.say(channel, `@${tags.username}, welcome!`);
         }
-    } else {
-        createUser(tags['display-name']);
-        client.say(channel, `@${tags.username}, welcome!`);
     }
+        
 
     RockPaperScissors();
     if(!duelActive) {
@@ -282,18 +284,26 @@ async function RockPaperScissors() {
             VipMessage.push(currentVs[1].username)
             console.log("player 2 wins!");
             duelActive = false;
-            currentVs = [];
         } else if(currentVs[1].chatPower <= 0) {
             VipMessage = []
             VipMessage.push(currentVs[0].username)
             console.log("player 1 wins!");
             duelActive = false;
-            currentVs = [];
+            
         }
-        currentMoves = []
-        for(let i = 0; i < 2; i++) {
-            currentMoves.push("null");
-        }
-        console.log(currentMoves);
+
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        resetGame();
+        
+    }
+}
+
+function resetGame() {
+    currentMoves = []
+    for(let i = 0; i < 2; i++) {
+        currentMoves.push("null");
+    }
+    if (!duelActive) {
+        currentVs = [];
     }
 }

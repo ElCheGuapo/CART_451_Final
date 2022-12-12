@@ -8,40 +8,52 @@
     <title>RockPaperScissors</title>
 </head>
 <body>
+    <div class="w3-monospace">
     <div class="w3-row-padding w3-section">
-
+        <% if (fight) { %>
+        <div class="w3-center">
+            <h1><%= Players[0].username %>, Chat Power: <%= Players[0].chatPower %> </h1>
+            <h1> Vs. </h1>
+            <h1><%= Players[1].username %>, Chat Power: <%= Players[1].chatPower %> </h1>
+        </div>
         <div class="w3-half">
-            <div class="w3-card">
-                <% if (PlayerMoves[0] != "null") { %>
+            <div class="w3-card w3-center">
+                <% if (PlayerMoves[0] != "null" && PlayerMoves[1] != "null") { %>
 
                     <% if (PlayerMoves[0] == "!rock") { %>
-                        <img src="./images/img_rock.png" alt="rock" style="width:100%"> 
+                        <h1> ROCK </h1>
                     <% } else if (PlayerMoves[0] == "!paper") { %>
-                        <img src="./images/img_paper.png" alt="paper" style="width:100%">
+                        <h1> PAPER </h1>
                     <% } else if (PlayerMoves[0] == "!scissors") { %>
-                        <img src="./images/img_scissors.png" alt="scissors" style="width:100%">
+                        <h1> SCISSORS </h1>
                     <% } %>
     
+                <% } else if (PlayerMoves[0] != "null" && PlayerMoves[1] == "null") {%>
+                    <h1> Player 1 has chosen </h1>
                 <% } %>
             </div>
         </div>
 
         <div class="w3-half">
-            <div class="w3-card">
-            <% if (PlayerMoves[1] != "null") { %>
+            <div class="w3-card w3-center">
+            <% if (PlayerMoves[0] != "null" && PlayerMoves[1] != "null") { %>
 
                 <% if (PlayerMoves[1] == "!rock") { %>
-                    <img src="public/images/img_rock.png" alt="rock" style="width:100%"> 
+                    <h1> ROCK </h1>
                 <% } else if (PlayerMoves[1] == "!paper") { %>
-                    <img src="/Chatter Showdown/views/public/images/img_paper.png" alt="paper" style="width:100%">
+                    <h1> PAPER </h1>
                 <% } else if (PlayerMoves[1] == "!scissors") { %>
-                    <img src="/Chatter Showdown/views/public/images/img_scissors.png" alt="scissors" style="width:100%">
+                    <h1> SCISSORS </h1>
                 <% } %>
 
+            <% } else if (PlayerMoves[1] != "null" && PlayerMoves[0] == "null") {%>
+                <h1> Player 2 has chosen </h1>
             <% } %>
             </div>
         </div>
+        <% } %>
 
+    </div>
     </div>
 
 </body>
