@@ -114,6 +114,8 @@ async function fetchUser(name) {
     console.log("______________________");
 }
 
+
+
 async function refreshLeaderboard() {
     leaderboard = [];
     connect();
@@ -148,9 +150,19 @@ client.on('message', (channel, tags, message, self) => {
         VipMessage.push(message);
         console.log(VipMessage);
     }
+    if(message == "!help") {
+        client.say(channel, `@${tags.username}, Chatter Showdown is a twitch chat addon where users can compete in a level based rock paper scissors mini game, in order to have their name featured on the leaderboard on stream. Your level is determined by the amount of total chats you have sent. Being victorious in this mini-game allows your messages to be displayed on the stream until you are defeated!`);
+    }
     if(message == "!showStats") {
-        //console.log("Displaying Statistics for: " + `${tags['display-name']}`);
-        fetchUser(tags['display-name']);
+        var tempUser = await User.find({ username: name }).limit(1);
+        client.say("______________________");
+        client.say("Username: " + tempUser[0].username);
+        client.say(" ");
+        client.say("Total Messages Sent: " + tempUser[0].chatCount);
+        client.say(" ");
+        client.say("About: " + tempUser[0].bio);
+        client.say("______________________");
+        
     } else if(tags['display-name'] == channelName && message.includes("!beginDuel")) {
         let tempArr = message.split(".");
         RockPaperScissorsInit(tempArr[1], tempArr[2]);
